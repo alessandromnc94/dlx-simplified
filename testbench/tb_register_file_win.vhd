@@ -115,7 +115,7 @@ begin
 
   process (sub_ret, sub_call, reset) is
   begin
-    if reset = '1' then
+    if reset = reset_value then
       windows_in_rf <= 1;
     elsif rising_edge(sub_call) then
       windows_in_rf <= windows_in_rf + 1;

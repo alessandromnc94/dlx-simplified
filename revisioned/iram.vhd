@@ -3,7 +3,7 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
 use std.textio.all;
 use ieee.std_logic_textio.all;
-
+use work.my_const.all;
 
 -- instruction memory for dlx
 -- memory filled by a process which reads from a file
@@ -45,7 +45,7 @@ begin
     variable index_rst  : natural := 0;
     variable tmp_data_u : std_logic_vector(4*data_cell_width-1 downto 0);
   begin  -- process fill_mem_p
-    if (rst = '1') then
+    if (rst = reset_value) then
       file_open(mem_fp, "D:/Workspace/Microelectronics/dlx-project/scripts/ignore/test_dump.txt", read_mode);
       while (not endfile(mem_fp)) loop
         readline(mem_fp, file_line);

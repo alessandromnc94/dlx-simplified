@@ -1,7 +1,7 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
-
+use work.my_const.all;
 
 -- data memory for dlx
 -- memory initial status: all '0's
@@ -37,7 +37,7 @@ begin
     variable index : natural := 0;
   begin
     index := conv_integer(unsigned(addr_r));
-    if(rst = '1') then
+    if(rst = reset_value) then
       for i in 0 to 3 loop
         dout((i+1)*data_cell_width-1 downto i*data_cell_width) <= (others => '0');
       end loop;
@@ -58,7 +58,7 @@ begin
   begin
     index := conv_integer(unsigned(addr_w));
 
-    if (rst = '1') then
+    if (rst = reset_value) then
       dram_mem <= (others => (others => '0'));
     elsif (write_enable = '1') then
       if(write_single_cell = '1') then

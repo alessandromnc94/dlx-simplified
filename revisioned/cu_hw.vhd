@@ -168,7 +168,7 @@ begin
   -- process to pipeline control words
   cw_pipe : process (clk, rst)
   begin
-    if rst = '1' then                   -- asynchronous reset (active low)
+    if rst = reset_value then                   -- asynchronous reset (active low)
       cw1  <= (others => '0');
       cw2  <= (others => '0');
       cw3  <= (others => '0');
