@@ -131,39 +131,6 @@ architecture structural of dlx is
       meout      : out    std_logic_vector(n_bit-1 downto 0)  --me register data out
       );
   end component;
-
-  component iram is
-    generic (
-      ram_depth       : natural;
-      data_cell_width : natural;
-      addr_size       : natural
-      );
-    port (
-      rst  : in  std_logic;
-      addr : in  std_logic_vector(addr_size - 1 downto 0);
-      dout : out std_logic_vector(4*data_cell_width - 1 downto 0)
-      );
-
-  end component;
-
-  component dram is
-    generic (
-      ram_depth       : natural;
-      data_cell_width : natural;
-      addr_size       : natural
-      );
-    port (
-      rst               : in  std_logic;
-      addr_r            : in  std_logic_vector(addr_size - 1 downto 0);
-      addr_w            : in  std_logic_vector(addr_size - 1 downto 0);
-      read_enable       : in  std_logic;
-      write_enable      : in  std_logic;
-      write_single_cell : in  std_logic;
-      din               : in  std_logic_vector(4*data_cell_width - 1 downto 0);
-      dout              : out std_logic_vector(4*data_cell_width - 1 downto 0)
-      );
-
-  end component;
   
   signal reg_file_read_1    : std_logic;
   signal reg_file_read_2    : std_logic;
@@ -220,12 +187,45 @@ architecture structural of dlx is
   signal pcout           : std_logic_vector(datapath_n_bit-1 downto 0);
   signal aluout          : std_logic_vector(datapath_n_bit-1 downto 0);
   signal meout           : std_logic_vector(datapath_n_bit-1 downto 0);
-  
+
+  component iram is
+    generic (
+      ram_depth       : natural;
+      data_cell_width : natural;
+      addr_size       : natural
+      );
+    port (
+      rst  : in  std_logic;
+      addr : in  std_logic_vector(addr_size - 1 downto 0);
+      dout : out std_logic_vector(4*data_cell_width - 1 downto 0)
+      );
+
+  end component;
+
   constant iram_addr_size       : natural := 32;
   constant iram_depth           : natural := 1024*4;
   constant iram_data_cell_width : natural := 8;
   signal iram_addr              : std_logic_vector(iram_addr_size - 1 downto 0);
   signal iram_dout              : std_logic_vector(4*iram_data_cell_width - 1 downto 0);
+
+  component dram is
+    generic (
+      ram_depth       : natural;
+      data_cell_width : natural;
+      addr_size       : natural
+      );
+    port (
+      rst               : in  std_logic;
+      addr_r            : in  std_logic_vector(addr_size - 1 downto 0);
+      addr_w            : in  std_logic_vector(addr_size - 1 downto 0);
+      read_enable       : in  std_logic;
+      write_enable      : in  std_logic;
+      write_single_cell : in  std_logic;
+      din               : in  std_logic_vector(4*data_cell_width - 1 downto 0);
+      dout              : out std_logic_vector(4*data_cell_width - 1 downto 0)
+      );
+
+  end component;
 
   constant dram_addr_size       : natural := 32;
   constant dram_depth           : natural := 1024*4;
@@ -253,8 +253,6 @@ begin
   -- m4s  <= '1';
   -- m5s  <= '1';
   -- mws  <= '1';
-  opcode <= --DA ATTRIBUIRE
-  func <= --DA ATTRIBUIRE
 
   datapath0 : datapath generic map (
     imm_val_size  => datapath_imm_val_size,
