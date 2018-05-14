@@ -13,6 +13,7 @@ entity branch_unit is
     bnez : in  std_logic;                        --from cu
     jr   : in  std_logic;
     jmp  : in  std_logic;
+    branch_taken: out std_logic;
     pc   : out std_logic_vector(n1-1 downto 0)
     );
 end entity;
@@ -104,5 +105,7 @@ begin
     port map(os, reg, jr, om1);
   mux4 : mux_n_2_1 generic map(n => n1)
     port map(npc, om1, do_jump, pc);
+
+  branch_taken <= do_jump;
 
 end architecture;
