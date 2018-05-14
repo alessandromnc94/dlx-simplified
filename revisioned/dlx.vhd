@@ -120,7 +120,6 @@ architecture structural of dlx is
       msksel2    : in     std_logic;    --selector for load byte mask
       msksigned2 : in     std_logic;    -- mask is signed if enabled
       lmde       : in     std_logic;    --lmd register enable
-      m4s        : in     std_logic;    --mux 5 selector
       aw3e       : in     std_logic;    --address write3 reg enable
       -- 5th stage
       m5s        : in     std_logic;    --mux 5 selector
@@ -129,6 +128,7 @@ architecture structural of dlx is
       pcout      : buffer std_logic_vector(n_bit-1 downto 0);  --program counter output per le dimensioni puoi cambiarlo, la iram puo' essere diversa dalla dram
       aluout     : buffer std_logic_vector(n_bit-1 downto 0);  --alu outpud data
       meout      : out    std_logic_vector(n_bit-1 downto 0)  --me register data out
+      irout      : buffer std_logic_vector(n_bit-1 downto 0)   -- ir out for cu
       );
   end component;
 
@@ -174,8 +174,8 @@ architecture structural of dlx is
   signal jump_en            : std_logic;
   signal jr_en              : std_logic;
   signal jl_en              : std_logic;
-  signal forwarding_in_1_en : std_logic;
-  signal forwarding_in_2_en : std_logic;
+  --signal forwarding_in_1_en : std_logic;
+  --signal forwarding_in_2_en : std_logic;
   signal alu_op_sel         : alu_array;
   signal alu_pc_sel         : std_logic;
   signal alu_get_imm_in     : std_logic;
@@ -208,6 +208,7 @@ architecture structural of dlx is
   signal ire             : std_logic;
   signal pre             : std_logic;
   signal aw1e            : std_logic;
+  signal lmde            : std_logic;
   signal datapath_m3s             : std_logic;
   signal mee             : std_logic;
   signal datapath_mps             : std_logic;
@@ -231,6 +232,7 @@ architecture structural of dlx is
   constant dram_depth           : natural := 1024*4;
   constant dram_data_cell_width : natural := 8;
   signal dram_dout              : std_logic_vector(4*dram_data_cell_width - 1 downto 0);
+  signal irout                  : std_logic_vector(datapath_n_bit-1 downto 0);
 
 begin
   
@@ -244,17 +246,10 @@ begin
   ire  <= '1';
   pre  <= '1';
   aw1e <= '1';
-  -- m3s  <= '1';
   mee  <= '1';
-  -- mps  <= '1';
   -- mss  <= '1';
   r1e  <= '1';
-  -- lmde <= '1';
-  -- m4s  <= '1';
-  -- m5s  <= '1';
-  -- mws  <= '1';
-  opcode <= --DA ATTRIBUIRE
-  func <= --DA ATTRIBUIRE
+  lmde <= '1';
 
   datapath0 : datapath generic map (
     imm_val_size  => datapath_imm_val_size,
@@ -268,8 +263,8 @@ begin
       rst        => rst,
       pce        => pce,
       npce       => npce,
-      ire        => ire,
-      rfe        => datapath_rfe,
+      ire        => reg_imm_en,
+      rfe        => rfe,
       rfr1       => reg_file_read_1,
       rfr2       => reg_file_read_2,
       rfw        => reg_file_write,
@@ -284,55 +279,55 @@ begin
       pre        => pre,
       aw1e       => aw1e,
       alusel     => alu_op_sel,
-      m3s        => datapath_m3s,
+      m3s        => alu_get_imm_in,
       aoe        => alu_out_reg_en,
       mee        => mee,
-      mps        => datapath_mps,
-      mss        => datapath_mss,
+      mps        => jl_en,
+      mss        => datapath_mss, --????
       aw2e       => add_w_pipe_2_en,
       r1e        => r1e,
       msksel2    => mask_2_en,
       msksigned2 => mask_2_signed,
-      lmde       => datapath_lmde,
-      m4s        => datapath_m4s,
+      lmde       => lmde,
       aw3e       => add_w_pipe_3_en,
-      m5s        => datapath_m5s,
-      mws        => datapath_mws,
+      m5s        => mem_out_sel,
+      mws        => alu_bypass_en,
       pcout      => pcout,
       aluout     => aluout,
-      meout      => meout
+      meout      => meout,
+      irout      => irout
       );
 
   cu_hw0 : cu_hw port map (
     reg_file_read_1    => reg_file_read_1,
     reg_file_read_2    => reg_file_read_2,
-    reg_imm_en         => reg_imm_en, --????
+    reg_imm_en         => reg_imm_en,
     imm_sign_ext_en    => imm_sign_ext_en,
     branch_en          => branch_en,
     branch_nez         => branch_nez,
     jump_en            => jump_en,
     jr_en              => jr_en,
-    jl_en              => jl_en, --????
-    forwarding_in_1_en => forwarding_in_1_en, --????
-    forwarding_in_2_en => forwarding_in_2_en, --????
+    jl_en              => jl_en,
+    forwarding_in_1_en => open,
+    forwarding_in_2_en => open,
     alu_op_sel         => alu_op_sel,
     alu_pc_sel         => alu_pc_sel,
-    alu_get_imm_in     => alu_get_imm_in, --????
+    alu_get_imm_in     => alu_get_imm_in,
     alu_out_reg_en     => alu_out_reg_en,
     b_bypass_en        => b_bypass_en,
     add_w_pipe_2_en    => add_w_pipe_2_en,
-    alu_bypass_en      => alu_bypass_en, --????
+    alu_bypass_en      => alu_bypass_en,
     dram_read_en       => dram_read_en,
     dram_write_en      => dram_write_en,
     dram_write_byte    => dram_write_byte,
     mask_2_signed      => mask_2_signed,
     mask_2_en          => mask_2_en,
     add_w_pipe_3_en    => add_w_pipe_3_en,
-    mem_out_sel        => mem_out_sel, --????
+    mem_out_sel        => mem_out_sel,
     reg_file_write     => reg_file_write,
     branch_taken       => branch_taken, --????
-    opcode             => opcode,
-    func               => func,
+    opcode             => irout(n_bit-1 downto n_bit-opcode_size),
+    func               => irout(func_size-1 downto 0),
     clk                => clk,
     rst                => rst
     );

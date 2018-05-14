@@ -54,7 +54,6 @@ entity datapath is
     msksel2    : in     std_logic;      --selector for load byte mask
     msksigned2 : in     std_logic;      -- mask is signed if enabled
     lmde       : in     std_logic;      --lmd register enable
-    m4s        : in     std_logic;      --mux 5 selector
     aw3e       : in     std_logic;      --address write3 reg enable
     -- 5th stage
     m5s        : in     std_logic;      --mux 5 selector
@@ -62,7 +61,8 @@ entity datapath is
     -- outputs
     pcout      : buffer std_logic_vector(n_bit-1 downto 0);  --program counter output per le dimensioni puoi cambiarlo, la iram puo' essere diversa dalla dram
     aluout     : buffer std_logic_vector(n_bit-1 downto 0);  --alu outpud data
-    meout      : out    std_logic_vector(n_bit-1 downto 0)  --me register data out
+    meout      : out    std_logic_vector(n_bit-1 downto 0);  --me register data out
+    irout      : buffer std_logic_vector(n_bit-1 downto 0)   -- ir out for cu
     );
 end entity;
 
@@ -206,9 +206,8 @@ architecture structural of datapath is
   end component;
 
   signal pcin, npcin, npcout, pcregout, mux31win, addrd1, addrd2    : std_logic_vector(n_bit-1 downto 0);
-  signal irout                                                      : std_logic_vector(n_bit-1 downto 0);
   signal om5, ain, bin, immin, aout, bout, immout, fuo1, fuo2, fuo3 : std_logic_vector(n_bit-1 downto 0);
-  signal fuo4, om1, om2, om3, om4, oalu, r1out, lmdout, ompc        : std_logic_vector(n_bit-1 downto 0);
+  signal fuo4, om1, om2, om3, oalu, r1out, lmdout, ompc        : std_logic_vector(n_bit-1 downto 0);
   signal omopc, wri, msk2out, aw1o, aw2o, aw3o                      : std_logic_vector(n_bit-1 downto 0);
   signal fum                                                        : std_logic_vector(1 downto 0);
 
@@ -242,7 +241,7 @@ begin
   branch : branch_unit generic map(n1 => n_bit)
     port map(immin, om1, npcout, be, bnez, jr, jmp, pcin);
   forwinst : forwarding_unit generic map(n => reg_addr_size, m => n_bit)
-    port map(addrd1, addrd2, aw1o, aw2o, aw3o, aw1e, aw2e, aw3e, oalu, aluout, om4, clk, fum, fuo1, fuo2);
+    port map(addrd1, addrd2, aw1o, aw2o, aw3o, aw1e, aw2e, aw3e, oalu, aluout, om5, clk, fum, fuo1, fuo2);
   mux1 : mux_n_2_1 generic map(n => n_bit)
     port map(ain, fuo1, fum(0), om1);
   mux2 : mux_n_2_1 generic map(n => n_bit)
@@ -281,8 +280,6 @@ begin
     port map(lmdin, msksel2, msksigned2, msk2out);
   lmd : register_n generic map(n => n_bit)
     port map(msk2out, clk, rst, '0', lmde, lmdout);
-  mux4 : mux_n_2_1 generic map(n => n_bit)
-    port map(r1out, lmdout, m4s, om4);
   add_w3 : register_n generic map(n => n_bit)
     port map(aw2o, clk, rst, '0', aw3e, aw3o);
 
