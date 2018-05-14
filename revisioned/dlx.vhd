@@ -98,6 +98,7 @@ architecture structural of dlx is
       bnez       : in     std_logic;    --beqz/!bnez
       jr         : in     std_logic;    --jr/!nojr
       jmp        : in     std_logic;    --jmp/!nojmp
+      branch_taken        : out     std_logic;    -- branch done
       --sign extender and registers signals
       see        : in     std_logic;    --sign extender enable
       ae         : in     std_logic;    --a register enable
@@ -272,6 +273,7 @@ begin
       bnez       => branch_nez,
       jr         => jr_en,
       jmp        => jump_en,
+      branch_taken        => branch_taken,
       see        => imm_sign_ext_en,
       ae         => ae,
       ben        => ben,

@@ -32,6 +32,7 @@ entity datapath is
     bnez       : in     std_logic;      --beqz/!bnez
     jr         : in     std_logic;      --jr/!nojr
     jmp        : in     std_logic;      --jmp/!nojmp
+    branch_taken : out std_logic; -- branch done
     --sign extender and registers signals
     see        : in     std_logic;      --sign extender enable
     ae         : in     std_logic;      --a register enable
@@ -107,9 +108,13 @@ architecture structural of datapath is
       bnez : in  std_logic;                        --from cu
       jr   : in  std_logic;
       jmp  : in  std_logic;
+      branch_taken: out std_logic;
       pc   : out std_logic_vector(n1-1 downto 0)
       );
   end component;
+
+  
+  signal branch_taken    : std_logic;
 
   component register_file is
     generic (
@@ -239,7 +244,7 @@ begin
   sign_extend : sign_extender generic map(n_in => imm_val_size, n_out => n_bit)
     port map(irout(n_bit-17 downto 0), see, immin);
   branch : branch_unit generic map(n1 => n_bit)
-    port map(immin, om1, npcout, be, bnez, jr, jmp, pcin);
+    port map(immin, om1, npcout, be, bnez, jr, jmp, branch_taken,pcin);
   forwinst : forwarding_unit generic map(n => reg_addr_size, m => n_bit)
     port map(addrd1, addrd2, aw1o, aw2o, aw3o, aw1e, aw2e, aw3e, oalu, aluout, om5, clk, fum, fuo1, fuo2);
   mux1 : mux_n_2_1 generic map(n => n_bit)
