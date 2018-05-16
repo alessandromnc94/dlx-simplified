@@ -285,7 +285,7 @@ begin
       aoe        => alu_out_reg_en,
       mee        => mee,
       mps        => jl_en,
-      mss        => datapath_mss, --????
+      mss        => jr_en,
       aw2e       => add_w_pipe_2_en,
       r1e        => r1e,
       msksel2    => mask_2_en,
