@@ -10,6 +10,7 @@ use ieee.std_logic_arith.all;
 use work.alu_types.all;
 use work.cu_hw_types.all;
 -- use work.cu_hw_functions.all;
+use work.my_const.all;
 
 entity cu_hw is
   port (

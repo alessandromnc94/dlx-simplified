@@ -12,6 +12,6 @@ package my_const is
   constant offconst   : std_logic_vector(n_bits-1 downto 0) := conv_std_logic_vector(8, n_bits);
   constant raddrconst : std_logic_vector(n_bits-1 downto 0) := conv_std_logic_vector(31, n_bits);
 
-  constant reset_value : std_logic := '0';
+  constant reset_value : std_logic := '1';
 
 end package;

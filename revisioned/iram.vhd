@@ -46,7 +46,7 @@ begin
     variable tmp_data_u : std_logic_vector(4*data_cell_width-1 downto 0);
   begin  -- process fill_mem_p
     if (rst = reset_value) then
-      file_open(mem_fp, "D:/Workspace/Microelectronics/dlx-project/scripts/ignore/test_dump.txt", read_mode);
+      file_open(mem_fp, "D:/Workspace/Microelectronics/dlx-revision/simulation/modelsim/program.txt", read_mode);
       while (not endfile(mem_fp)) loop
         readline(mem_fp, file_line);
         hread(file_line, tmp_data_u);

@@ -128,7 +128,7 @@ architecture structural of dlx is
       -- outputs
       pcout      : buffer std_logic_vector(n_bit-1 downto 0);  --program counter output per le dimensioni puoi cambiarlo, la iram puo' essere diversa dalla dram
       aluout     : buffer std_logic_vector(n_bit-1 downto 0);  --alu outpud data
-      meout      : out    std_logic_vector(n_bit-1 downto 0)  --me register data out
+      meout      : out    std_logic_vector(n_bit-1 downto 0);  --me register data out
       irout      : buffer std_logic_vector(n_bit-1 downto 0)   -- ir out for cu
       );
   end component;
@@ -210,15 +210,15 @@ architecture structural of dlx is
   signal pre             : std_logic;
   signal aw1e            : std_logic;
   signal lmde            : std_logic;
-  signal datapath_m3s             : std_logic;
+  -- signal datapath_m3s             : std_logic;
   signal mee             : std_logic;
-  signal datapath_mps             : std_logic;
-  signal datapath_mss             : std_logic;
+  -- signal datapath_mps             : std_logic;
+  -- signal datapath_mss             : std_logic;
   signal r1e             : std_logic;
-  signal datapath_lmde            : std_logic;
-  signal datapath_m4s             : std_logic;
-  signal datapath_m5s             : std_logic;
-  signal datapath_mws             : std_logic;
+  -- signal datapath_lmde            : std_logic;
+  -- signal datapath_m4s             : std_logic;
+  -- signal datapath_m5s             : std_logic;
+  -- signal datapath_mws             : std_logic;
   signal pcout           : std_logic_vector(datapath_n_bit-1 downto 0);
   signal aluout          : std_logic_vector(datapath_n_bit-1 downto 0);
   signal meout           : std_logic_vector(datapath_n_bit-1 downto 0);
@@ -226,7 +226,7 @@ architecture structural of dlx is
   constant iram_addr_size       : natural := 32;
   constant iram_depth           : natural := 1024*4;
   constant iram_data_cell_width : natural := 8;
-  signal iram_addr              : std_logic_vector(iram_addr_size - 1 downto 0);
+  -- signal iram_addr              : std_logic_vector(iram_addr_size - 1 downto 0);
   signal iram_dout              : std_logic_vector(4*iram_data_cell_width - 1 downto 0);
 
   constant dram_addr_size       : natural := 32;
@@ -328,7 +328,7 @@ begin
     mem_out_sel        => mem_out_sel,
     reg_file_write     => reg_file_write,
     branch_taken       => branch_taken,
-    opcode             => irout(n_bit-1 downto n_bit-opcode_size),
+    opcode             => irout(datapath_n_bit-1 downto datapath_n_bit-opcode_size),
     func               => irout(func_size-1 downto 0),
     clk                => clk,
     rst                => rst
@@ -358,5 +358,10 @@ begin
       din               => meout,
       dout              => dram_dout
       );
+
+-- DEBUG
+
+  opcode <= irout(datapath_n_bit-1 downto datapath_n_bit-opcode_size);
+  func <= irout(func_size-1 downto 0);
 
 end architecture;

@@ -114,7 +114,6 @@ architecture structural of datapath is
   end component;
 
   
-  signal branch_taken    : std_logic;
 
   component register_file is
     generic (
@@ -216,17 +215,26 @@ architecture structural of datapath is
   signal omopc, wri, msk2out, aw1o, aw2o, aw3o                      : std_logic_vector(n_bit-1 downto 0);
   signal fum                                                        : std_logic_vector(1 downto 0);
 
+  signal reg_rst : std_logic := '1';
+
 begin
+
+  reg_rst_1_gen: if reset_value = '1' generate
+    reg_rst <= rst;
+  end generate reg_rst_1_gen;
+  reg_rst_0_gen: if reset_value = '0' generate
+    reg_rst <= not rst;
+  end generate reg_rst_0_gen;
 
   --fetch stage
   pc : register_n generic map(n => n_bit)
-    port map(pcin, clk, rst, '0', pce, pcout);
+    port map(pcin, clk, reg_rst, '0', pce, pcout);
   inrreg : register_n generic map(n => n_bit)
-    port map(instr, clk, rst, '0', ire, irout);
+    port map(instr, clk, reg_rst, '0', ire, irout);
   add : rca_n generic map(n => n_bit)
     port map(pcout, aconst, '0', npcin, open);
   npc : register_n generic map(n => n_bit)
-    port map(npcin, clk, rst, '0', npce, npcout);
+    port map(npcin, clk, reg_rst, '0', npce, npcout);
 
   --decode stage
   mux31win(n_bit-1 downto 5) <= (others => '0');
@@ -252,15 +260,15 @@ begin
   mux2 : mux_n_2_1 generic map(n => n_bit)
     port map(bin, fuo2, fum(1), om2);
   areg : register_n generic map(n => n_bit)
-    port map(om1, clk, rst, '0', ae, aout);
+    port map(om1, clk, reg_rst, '0', ae, aout);
   breg : register_n generic map(n => n_bit)
-    port map(om2, clk, rst, '0', ben, bout);
+    port map(om2, clk, reg_rst, '0', ben, bout);
   immreg : register_n generic map(n => n_bit)
-    port map(immin, clk, rst, '0', ie, immout);
+    port map(immin, clk, reg_rst, '0', ie, immout);
   pcpreg : register_n generic map(n => n_bit)
-    port map(pcout, clk, rst, '0', pre, pcregout);
+    port map(pcout, clk, reg_rst, '0', pre, pcregout);
   add_w1 : register_n generic map(n => n_bit)
-    port map(wri, clk, rst, '0', aw1e, aw1o);
+    port map(wri, clk, reg_rst, '0', aw1e, aw1o);
 
   --execute stage
   mux3 : mux_n_2_1 generic map(n => n_bit)
@@ -270,23 +278,23 @@ begin
   muxoffpc : mux_n_2_1 generic map(n => n_bit)
     port map(om3, offconst, mss, omopc);
   me : register_n generic map(n => n_bit)
-    port map(bout, clk, rst, '0', mee, meout);
+    port map(bout, clk, reg_rst, '0', mee, meout);
   aluinst : alu generic map(n => n_bit)
     port map(ompc, omopc, alusel, oalu);
   aluoutinst : register_n generic map(n => n_bit)
-    port map(oalu, clk, rst, '0', aoe, aluout);
+    port map(oalu, clk, reg_rst, '0', aoe, aluout);
   add_w2 : register_n generic map(n => n_bit)
-    port map(aw1o, clk, rst, '0', aw2e, aw2o);
+    port map(aw1o, clk, reg_rst, '0', aw2e, aw2o);
 
   --memory stage
   reg1inst : register_n generic map(n => n_bit)
-    port map(aluout, clk, rst, '0', r1e, r1out);
+    port map(aluout, clk, reg_rst, '0', r1e, r1out);
   mask02 : mask generic map(n => n_bit)
     port map(lmdin, msksel2, msksigned2, msk2out);
   lmd : register_n generic map(n => n_bit)
-    port map(msk2out, clk, rst, '0', lmde, lmdout);
+    port map(msk2out, clk, reg_rst, '0', lmde, lmdout);
   add_w3 : register_n generic map(n => n_bit)
-    port map(aw2o, clk, rst, '0', aw3e, aw3o);
+    port map(aw2o, clk, reg_rst, '0', aw3e, aw3o);
 
   --write back stage
   mux5 : mux_n_2_1 generic map(n => n_bit)

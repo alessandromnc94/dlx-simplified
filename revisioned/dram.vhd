@@ -36,12 +36,12 @@ begin
   process(addr_r, read_enable, rst)
     variable index : natural := 0;
   begin
-    index := conv_integer(unsigned(addr_r));
     if(rst = reset_value) then
       for i in 0 to 3 loop
         dout((i+1)*data_cell_width-1 downto i*data_cell_width) <= (others => '0');
       end loop;
     elsif(read_enable = '1') then
+      index := conv_integer(unsigned(addr_r));
       for i in 0 to 3 loop
         if(index+i < ram_depth) then
           dout((i+1)*data_cell_width-1 downto i*data_cell_width) <= dram_mem(index+i);
