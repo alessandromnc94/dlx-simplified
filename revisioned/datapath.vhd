@@ -1,5 +1,6 @@
 library ieee;
 use ieee.std_logic_1164.all;
+use ieee.std_logic_arith.all;
 use work.alu_types.all;
 use work.my_const.all;
 
@@ -238,19 +239,39 @@ begin
   pc : register_n generic map(n => n_bit)
     port map(pcin, clk, reg_rst, '0', pce, pcout);
   inrreg : register_n generic map(n => n_bit)
-    port map(instr, clk, reg_rst, '0', ire, irout);
+    -- port map(instr, clk, reg_rst, '0', ire, irout);
+    port map(instr, clk, reg_rst, '0', '1', irout);
   add : rca_n generic map(n => n_bit)
     port map(pcout, aconst, '0', npcin, open);
   npc : register_n generic map(n => n_bit)
     port map(npcin, clk, reg_rst, '0', npce, npcout);
 
   --decode stage
+  -- 31 downto 26 OPCODE
+  -- 25 downto 21 REG_TO_WRITE
+  -- 20 downto 16 REG_READ_1
+  -- 15 downto 11 REG_READ_2
+
   -- mux31win(n_bit-1 downto reg_addr_size) <= (others => '0');
-  mux31win(reg_addr_size-1 downto 0)       <= irout(n_bit-7 downto n_bit-11);
+  -- mux31win(reg_addr_size-1 downto 0)       <= irout(n_bit-7 downto n_bit-6-reg_addr_size);
+  mux31win(reg_addr_size-1 downto 0)       <= irout(25 downto 21);
   -- addrd1(n_bit-1 downto reg_addr_size) <= (others => '0');
-  addrd1(reg_addr_size-1 downto 0)     <= irout(n_bit-12 downto n_bit-16);
+  -- addrd1(reg_addr_size-1 downto 0)     <= irout(n_bit-7-reg_addr_size downto n_bit-6-2*reg_addr_size);
+  addrd1(reg_addr_size-1 downto 0)     <= irout(20 downto 16);
   -- addrd2(n_bit-1 downto reg_addr_size)   <= (others => '0');
-  addrd2(reg_addr_size-1 downto 0)       <= irout(n_bit-17 downto n_bit-21);
+  -- addrd2(reg_addr_size-1 downto 0)       <= irout(n_bit-7-2*reg_addr_size downto n_bit-6-3*reg_addr_size);
+  addrd2(reg_addr_size-1 downto 0)       <= irout(15 downto 11);
+
+  -- debug
+  process(clk)
+  begin
+    if rising_edge(clk) then
+      report "ADDRRD1 #" & Integer'image(conv_integer(unsigned(addrd1)));
+      report "ADDRRD2 #" & Integer'image(conv_integer(unsigned(addrd2)));
+      report "MUX31 #" & Integer'image(conv_integer(unsigned(mux31win)));
+      end if;
+    end process;
+
 
 
   mux31w : mux_n_2_1 generic map(n => reg_addr_size)
