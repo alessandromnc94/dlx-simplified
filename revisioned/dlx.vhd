@@ -198,7 +198,7 @@ architecture structural of dlx is
 
   constant datapath_imm_val_size  : natural := 16;
   constant datapath_j_val_size    : natural := 26;
-  constant datapath_reg_addr_size : natural := 32;
+  constant datapath_reg_addr_size : natural := 5;
   constant datapath_n_bit         : natural := 32;
   signal pce             : std_logic;
   signal npce            : std_logic;

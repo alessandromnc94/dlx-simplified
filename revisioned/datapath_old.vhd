@@ -4,11 +4,11 @@ use work.alu_types.all;
 use work.my_const.all;
 
 
-entity datapath is
+entity datapath_old is
   generic (
     imm_val_size  : natural := 16;
     j_val_size    : natural := 26;
-    reg_addr_size : natural := 5;
+    reg_addr_size : natural := 32;
     n_bit         : natural := 32
     );
   port (
@@ -67,7 +67,7 @@ entity datapath is
     );
 end entity;
 
-architecture structural of datapath is
+architecture structural of datapath_old is
 
   component register_n is
     generic (
@@ -150,7 +150,7 @@ architecture structural of datapath is
 
   component forwarding_unit is
     generic (
-      n : natural := 5;                --address length
+      n : natural := 32;                --address length
       m : natural := 32                 --data length
       );
     port (
@@ -209,18 +209,12 @@ architecture structural of datapath is
       );
   end component;
 
-  signal pcin, npcin, npcout, pcregout    : std_logic_vector(n_bit-1 downto 0);
-  -- signal mux31win, addrd1, addrd2    : std_logic_vector(n_bit-1 downto 0) := (others => '0');
-  signal mux31win  : std_logic_vector(reg_addr_size-1 downto 0) := (others => '0');
-  signal  addrd1, addrd2    : std_logic_vector(reg_addr_size-1 downto 0) := (others => '0');
+  signal pcin, npcin, npcout, pcregout, mux31win, addrd1, addrd2    : std_logic_vector(n_bit-1 downto 0);
   signal om5, ain, bin, immin, aout, bout, immout : std_logic_vector(n_bit-1 downto 0);
   signal fuo1, fuo2 : std_logic_vector(n_bit-1 downto 0);
   -- signal fuo3, fuo4 : std_logic_vector(n_bit-1 downto 0);
   signal  om1, om2, om3, oalu, r1out, lmdout, ompc        : std_logic_vector(n_bit-1 downto 0);
-  -- signal omopc, wri, msk2out, aw1o, aw2o, aw3o                      : std_logic_vector(n_bit-1 downto 0);
-  signal omopc, msk2out                    : std_logic_vector(n_bit-1 downto 0);
-  signal wri                    : std_logic_vector(reg_addr_size-1 downto 0);
-  signal aw1o, aw2o, aw3o                      : std_logic_vector(reg_addr_size-1 downto 0);
+  signal omopc, wri, msk2out, aw1o, aw2o, aw3o                      : std_logic_vector(n_bit-1 downto 0);
   signal fum                                                        : std_logic_vector(1 downto 0);
 
   signal reg_rst : std_logic := '1';
@@ -245,15 +239,15 @@ begin
     port map(npcin, clk, reg_rst, '0', npce, npcout);
 
   --decode stage
-  -- mux31win(n_bit-1 downto reg_addr_size) <= (others => '0');
-  mux31win(reg_addr_size-1 downto 0)       <= irout(n_bit-7 downto n_bit-11);
-  -- addrd1(n_bit-1 downto reg_addr_size) <= (others => '0');
-  addrd1(reg_addr_size-1 downto 0)     <= irout(n_bit-12 downto n_bit-16);
-  -- addrd2(n_bit-1 downto reg_addr_size)   <= (others => '0');
-  addrd2(reg_addr_size-1 downto 0)       <= irout(n_bit-17 downto n_bit-21);
+  mux31win(n_bit-1 downto 5) <= (others => '0');
+  mux31win(4 downto 0)       <= irout(n_bit-7 downto n_bit-11);
+  addrd1(n_bit-1 downto 5)   <= (others => '0');
+  addrd1(4 downto 0)         <= irout(n_bit-12 downto n_bit-16);
+  addrd2(n_bit-1 downto 5)   <= (others => '0');
+  addrd2(4 downto 0)         <= irout(n_bit-17 downto n_bit-21);
 
 
-  mux31w : mux_n_2_1 generic map(n => reg_addr_size)
+  mux31w : mux_n_2_1 generic map(n => n_bit)
     port map(mux31win, raddrconst, mws, wri);
   reg_file : register_file generic map(width_add => reg_addr_size, width_data => n_bit)
     port map(clk, rst, rfe, rfr1, rfr2, rfw, aw3o, addrd1, addrd2, om5, ain, bin);
@@ -275,8 +269,7 @@ begin
     port map(immin, clk, reg_rst, '0', ie, immout);
   pcpreg : register_n generic map(n => n_bit)
     port map(pcout, clk, reg_rst, '0', pre, pcregout);
-  -- add_w1 : register_n generic map(n => n_bit)
-  add_w1 : register_n generic map(n => reg_addr_size)
+  add_w1 : register_n generic map(n => n_bit)
     port map(wri, clk, reg_rst, '0', aw1e, aw1o);
 
   --execute stage
@@ -292,8 +285,7 @@ begin
     port map(ompc, omopc, alusel, oalu);
   aluoutinst : register_n generic map(n => n_bit)
     port map(oalu, clk, reg_rst, '0', aoe, aluout);
-  -- add_w2 : register_n generic map(n => n_bit)
-  add_w2 : register_n generic map(n => reg_addr_size)
+  add_w2 : register_n generic map(n => n_bit)
     port map(aw1o, clk, reg_rst, '0', aw2e, aw2o);
 
   --memory stage
@@ -303,8 +295,7 @@ begin
     port map(lmdin, msksel2, msksigned2, msk2out);
   lmd : register_n generic map(n => n_bit)
     port map(msk2out, clk, reg_rst, '0', lmde, lmdout);
-  -- add_w3 : register_n generic map(n => n_bit)
-  add_w3 : register_n generic map(n => reg_addr_size)
+  add_w3 : register_n generic map(n => n_bit)
     port map(aw2o, clk, reg_rst, '0', aw3e, aw3o);
 
   --write back stage
