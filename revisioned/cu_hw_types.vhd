@@ -9,7 +9,7 @@ package cu_hw_types is
 -- control unit std_logic_vector sizes
   constant opcode_size   : natural := 6;   -- opcode field size
   constant func_size     : natural := 11;  -- func field size 
-  constant cw_array_size : natural := 25;  -- cw size
+  constant cw_array_size : natural := 23;  -- cw size
 
 -- change the values of the instructions coding as you want, depending also on the type of control unit choosen
   subtype cw_array is std_logic_vector(cw_array_size-1 downto 0);
