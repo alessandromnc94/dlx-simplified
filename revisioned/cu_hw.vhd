@@ -41,7 +41,7 @@ entity cu_hw is
     add_w_pipe_3_en : out std_logic;
     -- wb   
     mem_out_sel     : out std_logic;
-    reg_file_write  : out std_logic :
+    reg_file_write  : out std_logic;
     -- inputs
     branch_taken    : in  std_logic;
     opcode          : in  opcode_array;

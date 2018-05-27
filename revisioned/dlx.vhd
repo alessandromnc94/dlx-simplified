@@ -16,57 +16,40 @@ architecture structural of dlx is
 
   component cu_hw is
     port (
-      -- cw
-      -- first pipe stage outputs: fetch
-      -- pc_en              : out std_logic;
-      -- npc_en             : out std_logic;
-      -- ir_en              : out std_logic;
-      --
-      -- second pipe stage outputs: decode
-      -- reg_file_en        : out std_logic;
-      reg_file_read_1    : out std_logic;  -- enable read from out_1 & store in reg a
-      reg_file_read_2    : out std_logic;  -- same as before for out 2 & reg b
-      reg_imm_en         : out std_logic;  -- load data from immediate
-      imm_sign_ext_en    : out std_logic;
-      branch_en          : out std_logic;
-      branch_nez         : out std_logic;
-      jump_en            : out std_logic;
-      jr_en              : out std_logic;  -- enable also pc_delay and store_in_r_31
-      jl_en              : out std_logic;
-      -- check
-      forwarding_in_1_en : out std_logic;  -- enable forwarding 1
-      forwarding_in_2_en : out std_logic;  -- enable forwarding 2
-      --
-      -- third pipe stage outputs: execute
-      -- alu selector
-      alu_op_sel         : out alu_array;
-      -- cw_mem signals
-      alu_pc_sel         : out std_logic;  -- put pc on alu in_1 && "+8" on alu in_2 
-      alu_get_imm_in     : out std_logic;
-      alu_out_reg_en     : out std_logic;
-      b_bypass_en        : out std_logic;
-      add_w_pipe_2_en    : out std_logic;
-      --
-      -- fourth pipe stage outputs: memory
-      -- cw_mem signals
-      alu_bypass_en      : out std_logic;
-      dram_read_en       : out std_logic;
-      dram_write_en      : out std_logic;
-      dram_write_byte    : out std_logic;
-      mask_2_signed      : out std_logic;
-      mask_2_en          : out std_logic;
-      add_w_pipe_3_en    : out std_logic;
-      --
-      -- fifth pipe stage outputs: write back
-      -- cw
-      mem_out_sel        : out std_logic;
-      reg_file_write     : out std_logic;
+      -- decode   
+      reg_file_read_1 : out std_logic;
+      reg_file_read_2 : out std_logic;
+      reg_imm_en      : out std_logic;
+      imm_sign_ext_en : out std_logic;
+      write_in_r31_en : out std_logic;
+      -- execute      
+      branch_en       : out std_logic;
+      branch_nez      : out std_logic;
+      jump_en         : out std_logic;
+      jr_en           : out std_logic;
+      jl_en           : out std_logic;
+      alu_pc_sel      : out std_logic;
+      alu_get_imm_in  : out std_logic;
+      alu_out_reg_en  : out std_logic;
+      b_bypass_en     : out std_logic;
+      add_w_pipe_2_en : out std_logic;
+      alu_op_sel      : out alu_array;
+      -- mem
+      dram_read_en    : out std_logic;
+      dram_write_en   : out std_logic;
+      dram_write_byte : out std_logic;
+      mask_2_signed   : out std_logic;
+      mask_2_en       : out std_logic;
+      add_w_pipe_3_en : out std_logic;
+      -- wb   
+      mem_out_sel     : out std_logic;
+      reg_file_write  : out std_logic;
       -- inputs
-      branch_taken       : in  std_logic;
-      opcode             : in  opcode_array;
-      func               : in  func_array;
-      clk                : in  std_logic;
-      rst                : in  std_logic
+      branch_taken    : in  std_logic;
+      opcode          : in  opcode_array;
+      func            : in  func_array;
+      clk             : in  std_logic;
+      rst             : in  std_logic
       );
   end component;
 
@@ -170,20 +153,18 @@ architecture structural of dlx is
   signal reg_file_read_2    : std_logic;
   signal reg_imm_en         : std_logic;
   signal imm_sign_ext_en    : std_logic;
+  signal write_in_r31_en    : std_logic;
   signal branch_en          : std_logic;
   signal branch_nez         : std_logic;
   signal jump_en            : std_logic;
   signal jr_en              : std_logic;
   signal jl_en              : std_logic;
-  --signal forwarding_in_1_en : std_logic;
-  --signal forwarding_in_2_en : std_logic;
   signal alu_op_sel         : alu_array;
   signal alu_pc_sel         : std_logic;
   signal alu_get_imm_in     : std_logic;
   signal alu_out_reg_en     : std_logic;
   signal b_bypass_en        : std_logic;
   signal add_w_pipe_2_en    : std_logic;
-  signal alu_bypass_en      : std_logic;
   signal dram_read_en       : std_logic;
   signal dram_write_en      : std_logic;
   signal dram_write_byte    : std_logic;
@@ -210,15 +191,8 @@ architecture structural of dlx is
   signal pre             : std_logic;
   signal aw1e            : std_logic;
   signal lmde            : std_logic;
-  -- signal datapath_m3s             : std_logic;
   signal mee             : std_logic;
-  -- signal datapath_mps             : std_logic;
-  -- signal datapath_mss             : std_logic;
   signal r1e             : std_logic;
-  -- signal datapath_lmde            : std_logic;
-  -- signal datapath_m4s             : std_logic;
-  -- signal datapath_m5s             : std_logic;
-  -- signal datapath_mws             : std_logic;
   signal pcout           : std_logic_vector(datapath_n_bit-1 downto 0);
   signal aluout          : std_logic_vector(datapath_n_bit-1 downto 0);
   signal meout           : std_logic_vector(datapath_n_bit-1 downto 0);
@@ -248,7 +222,6 @@ begin
   pre  <= '1';
   aw1e <= '1';
   mee  <= '1';
-  -- mss  <= '1';
   r1e  <= '1';
   lmde <= '1';
 
@@ -285,7 +258,7 @@ begin
       aoe        => alu_out_reg_en,
       mee        => mee,
       mps        => jl_en,
-      mss        => jr_en,
+      mss        => alu_pc_sel,
       aw2e       => add_w_pipe_2_en,
       r1e        => r1e,
       msksel2    => mask_2_en,
@@ -293,7 +266,7 @@ begin
       lmde       => lmde,
       aw3e       => add_w_pipe_3_en,
       m5s        => mem_out_sel,
-      mws        => alu_bypass_en,
+      mws        => write_in_r31_en,
       pcout      => pcout,
       aluout     => aluout,
       meout      => meout,
@@ -305,20 +278,18 @@ begin
     reg_file_read_2    => reg_file_read_2,
     reg_imm_en         => reg_imm_en,
     imm_sign_ext_en    => imm_sign_ext_en,
+    write_in_r31_en    => write_in_r31_en,
     branch_en          => branch_en,
     branch_nez         => branch_nez,
     jump_en            => jump_en,
     jr_en              => jr_en,
     jl_en              => jl_en,
-    forwarding_in_1_en => open,
-    forwarding_in_2_en => open,
-    alu_op_sel         => alu_op_sel,
     alu_pc_sel         => alu_pc_sel,
     alu_get_imm_in     => alu_get_imm_in,
     alu_out_reg_en     => alu_out_reg_en,
     b_bypass_en        => b_bypass_en,
     add_w_pipe_2_en    => add_w_pipe_2_en,
-    alu_bypass_en      => alu_bypass_en,
+    alu_op_sel         => alu_op_sel,
     dram_read_en       => dram_read_en,
     dram_write_en      => dram_write_en,
     dram_write_byte    => dram_write_byte,
