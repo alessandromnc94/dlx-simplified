@@ -20,7 +20,7 @@ entity cu_hw is
     reg_imm_en      : out std_logic;
     imm_sign_ext_en : out std_logic;
     write_in_r31_en : out std_logic;
--- execute      
+    -- execute      
     branch_en       : out std_logic;
     branch_nez      : out std_logic;
     jump_en         : out std_logic;
@@ -31,23 +31,23 @@ entity cu_hw is
     alu_out_reg_en  : out std_logic;
     b_bypass_en     : out std_logic;
     add_w_pipe_2_en : out std_logic;
--- mem
+    alu_op_sel      : out alu_array;
+    -- mem
     dram_read_en    : out std_logic;
     dram_write_en   : out std_logic;
     dram_write_byte : out std_logic;
     mask_2_signed   : out std_logic;
     mask_2_en       : out std_logic;
     add_w_pipe_3_en : out std_logic;
--- wb   
+    -- wb   
     mem_out_sel     : out std_logic;
     reg_file_write  : out std_logic :
-
     -- inputs
-    branch_taken : in std_logic;
-    opcode       : in opcode_array;
-    func         : in func_array;
-    clk          : in std_logic;
-    rst          : in std_logic
+    branch_taken    : in  std_logic;
+    opcode          : in  opcode_array;
+    func            : in  func_array;
+    clk             : in  std_logic;
+    rst             : in  std_logic
     );
 end entity;
 
@@ -154,6 +154,7 @@ begin
   alu_out_reg_en  <= cw(cwx_array_size-8);
   b_bypass_en     <= cw(cwx_array_size-9);
   add_w_pipe_2_en <= cw(cwx_array_size-10);
+  alu_op_sel      <= alu3;
 -- mem
   dram_read_en    <= cw(cwx_array_size-1);
   dram_write_en   <= cw(cwx_array_size-2);
