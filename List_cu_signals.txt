@@ -8,17 +8,17 @@
     jr_en              jr/!nojr(=1 per jr e jalr =0 per j e jal)
     jl_en              drives mux between PC and register A that feeds the ALU(=1 data from PC, =0 data from RegA/Forwarding)
     alu_op_sel         select alu op
-    alu_pc_sel         Credo sia un old signal da prima che aggiungessimo jr_en e jl_en, ora il lavoro di questo è fatto da loro(li ho mappati così nel dlx almeno). Rimuovi(?)
+    alu_pc_sel         select between PC and constant '8' for the ALU(for jal and jalr instr)
     alu_get_imm_in     select between Breg e immediate(=0 per B e =1 per immediate)
     alu_out_reg_en     alu out register enable
     b_bypass_en        enable register that brings data directly from Breg to Data Memory, bypassing ALU
     add_w_pipe_2_en    enable register pipeline degli indirizzi nello stadio di execute
-    alu_bypass_en      mux selector per write addr per register file(mux is physically in decode stage, but driven in wb stage, =0 per dato da IR, =1 per dato da pipeline indirizzi)
+    write_r31_en      mux selector per write addr per register file(mux is physically in decode stage, but driven in wb stage, =0 per dato da IR, =1 per dato da pipeline indirizzi)
     dram_read_en       come da nome
     dram_write_en      come da nome
     dram_write_byte    come da nome
     mask_2_signed      enable per sign extend alla maschera nello stadio di execute
     mask_2_en          selector per la mask in execute(per la size)
     add_w_pipe_3_en    enable register pipeline degli indirizzi nello stadio di memory
-    mem_out_sel        selector tra LMDregister(output data memory) e registro che trasporta aluout allo stadio di write back saltando la data memory(=0 per LMD, =1 per l'altro registro). Occhio che lo hai chiamato alu_bypass nel tuo diagramma a blocchi, però in questo mapping alu_bypass serve a bypassare la ALU come scritto sopra
+    mem_out_sel        selector tra LMDregister(output data memory) e registro che trasporta aluout allo stadio di write back saltando la data memory(=0 per LMD, =1 per l'altro registro). Occhio che lo hai chiamato alu_bypass nel tuo diagramma a blocchi, perÃ² in questo mapping alu_bypass serve a bypassare la ALU come scritto sopra
     reg_file_write     register file write enable
