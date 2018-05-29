@@ -22,8 +22,8 @@ architecture test of tb_dlx is
   signal rst_t : std_logic := reset_value;
 
 begin
-  clk_t <= not clk_t after 1 ns;
-  rst_t <= not reset_value after 2 ns;
+  clk_t <= not clk_t       after 0.5 ns;
+  rst_t <= not reset_value after 5 ns;
   dut : dlx port map(
     clk_t,
     rst_t);

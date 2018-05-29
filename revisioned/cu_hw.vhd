@@ -58,11 +58,9 @@ architecture behavioral of cu_hw is
 
   -- lut for control word
   signal cw_mem : cw_mem_matrix := (
-    rtype_add   => "11000000000010110000111",
+    rtype       => "11000000000010110000111",
     itype_addi  => "10100000000110110000111",
-    rtype_addu  => "11000000000010110000111",
     itype_addui => "10110000000110110000111",
-    rtype_and   => "11000000000010110000111",
     itype_andi  => "10100000000110110000111",
     beqz        => "10100100000100010000010",
     bnez        => "10100110000100010000010",
@@ -73,64 +71,45 @@ architecture behavioral of cu_hw is
     lb          => "10100000000110100011101",
     lbu         => "10100000000110100001101",
     lw          => "10100000000110100000101",
-    rtype_mult  => "11000000000010110000111",
-    rtype_multu => "11000000000010110000111",
     nop         => cw_nop,
-    rtype_or    => "11000000000010110000111",
     itype_ori   => "10100000000110110000111",
     sb          => "11100000000111011100010",
-    rtype_seq   => "11000000000010110000111",
     itype_seqi  => "10100000000110110000111",
-    rtype_sge   => "11000000000010110000111",
     itype_sgei  => "10100000000110110000111",
-    rtype_sgeu  => "11000000000010110000111",
     itype_sgeui => "10110000000110110000111",
-    rtype_sgt   => "11000000000010110000111",
     itype_sgti  => "10100000000110110000111",
-    rtype_sgtu  => "11000000000010110000111",
     itype_sgtui => "10110000000110110000111",
-    rtype_sle   => "11000000000010110000111",
     itype_slei  => "10100000000110110000111",
-    rtype_sleu  => "11000000000010110000111",
     itype_sleui => "10110000000110110000111",
-    rtype_sll   => "11000000000010110000111",
     itype_slli  => "10100000000110110000111",
-    rtype_slt   => "11000000000010110000111",
     itype_slti  => "10100000000110110000111",
-    rtype_sltu  => "11000000000010110000111",
     itype_sltui => "10110000000110110000111",
-    rtype_sne   => "11000000000010110000111",
     itype_snei  => "10100000000110110000111",
-    rtype_sra   => "11000000000010110000111",
     itype_srai  => "10100000000110110000111",
-    rtype_srl   => "11000000000010110000111",
     itype_srli  => "10100000000110110000111",
-    rtype_sub   => "11000000000010110000111",
     itype_subi  => "10100000000110110000111",
-    rtype_subu  => "11000000000010110000111",
     itype_subui => "10110000000110110000111",
     sw          => "11100000000111011000010",
-    rtype_xor   => "11000000000010110000111",
     itype_xori  => "10100000000110110000111",
     others      => cw_nop               -- instructions not defined
     );
   -- control word from lut
-  signal cw               : cw_array                                    := (others => '0');
+  signal cw               : cw_array  := (others => '0');
   -- split cw in stages
-  constant cw1_array_size : natural                                     := cw_array_size;
-  signal cw1              : cw_array                                    := (others => '0');
-  constant cw2_array_size : natural                                     := cw1_array_size;
-  signal cw2              : std_logic_vector(cw2_array_size-1 downto 0) := (others => '0');
-  constant cw3_array_size : natural                                     := cw2_array_size-5;
-  signal cw3              : std_logic_vector(cw3_array_size-1 downto 0) := (others => '0');
-  constant cw4_array_size : natural                                     := cw3_array_size-10;
-  signal cw4              : std_logic_vector(cw4_array_size-1 downto 0) := (others => '0');
-  constant cw5_array_size : natural                                     := cw4_array_size-6;
-  signal cw5              : std_logic_vector(cw5_array_size-1 downto 0) := (others => '0');
+  constant cw1_array_size : natural   := cw_array_size;
+  signal cw1              : cw_array  := (others => '0');
+  constant cw2_array_size : natural   := cw1_array_size;
+  signal cw2              : cw_array  := (others => '0');
+  constant cw3_array_size : natural   := cw2_array_size-5;
+  signal cw3              : cw_array  := (others => '0');
+  constant cw4_array_size : natural   := cw3_array_size-10;
+  signal cw4              : cw_array  := (others => '0');
+  constant cw5_array_size : natural   := cw4_array_size-6;
+  signal cw5              : cw_array  := (others => '0');
   -- delay alu control word
-  signal alu1, alu2, alu3 : alu_array                                   := (others => '0');
+  signal alu1, alu2, alu3 : alu_array := (others => '0');
   -- signals to manage cw words
-  signal alu              : alu_array                                   := (others => '0');  -- alu code from func
+  signal alu              : alu_array := (others => '0');  -- alu code from func
 
 begin
   -- get output from luts
@@ -138,33 +117,33 @@ begin
 
 
   -- decode     
-  reg_file_read_1 <= cw(cwx_array_size-1);
-  reg_file_read_2 <= cw(cwx_array_size-2);
-  reg_imm_en      <= cw(cwx_array_size-3);
-  imm_sign_ext_en <= cw(cwx_array_size-4);
-  write_in_r31_en <= cw(cwx_array_size-5);
+  reg_file_read_1 <= cw2(cw2_array_size-1);
+  reg_file_read_2 <= cw2(cw2_array_size-2);
+  reg_imm_en      <= cw2(cw2_array_size-3);
+  imm_sign_ext_en <= cw2(cw2_array_size-4);
+  write_in_r31_en <= cw2(cw2_array_size-5);
 -- execute      
-  branch_en       <= cw(cwx_array_size-1);
-  branch_nez      <= cw(cwx_array_size-2);
-  jump_en         <= cw(cwx_array_size-3);
-  jr_en           <= cw(cwx_array_size-4);
-  jl_en           <= cw(cwx_array_size-5);
-  alu_pc_sel      <= cw(cwx_array_size-6);
-  alu_get_imm_in  <= cw(cwx_array_size-7);
-  alu_out_reg_en  <= cw(cwx_array_size-8);
-  b_bypass_en     <= cw(cwx_array_size-9);
-  add_w_pipe_2_en <= cw(cwx_array_size-10);
+  branch_en       <= cw3(cw3_array_size-1);
+  branch_nez      <= cw3(cw3_array_size-2);
+  jump_en         <= cw3(cw3_array_size-3);
+  jr_en           <= cw3(cw3_array_size-4);
+  jl_en           <= cw3(cw3_array_size-5);
+  alu_pc_sel      <= cw3(cw3_array_size-6);
+  alu_get_imm_in  <= cw3(cw3_array_size-7);
+  alu_out_reg_en  <= cw3(cw3_array_size-8);
+  b_bypass_en     <= cw3(cw3_array_size-9);
+  add_w_pipe_2_en <= cw3(cw3_array_size-10);
   alu_op_sel      <= alu3;
 -- mem
-  dram_read_en    <= cw(cwx_array_size-1);
-  dram_write_en   <= cw(cwx_array_size-2);
-  dram_write_byte <= cw(cwx_array_size-3);
-  mask_2_signed   <= cw(cwx_array_size-4);
-  mask_2_en       <= cw(cwx_array_size-5);
-  add_w_pipe_3_en <= cw(cwx_array_size-6);
+  dram_read_en    <= cw4(cw4_array_size-1);
+  dram_write_en   <= cw4(cw4_array_size-2);
+  dram_write_byte <= cw4(cw4_array_size-3);
+  mask_2_signed   <= cw4(cw4_array_size-4);
+  mask_2_en       <= cw4(cw4_array_size-5);
+  add_w_pipe_3_en <= cw4(cw4_array_size-6);
 -- wb   
-  mem_out_sel     <= cw(cwx_array_size-1);
-  reg_file_write  <= cw(cwx_array_size-2);
+  mem_out_sel     <= cw5(cw5_array_size-1);
+  reg_file_write  <= cw5(cw5_array_size-2);
   -- process to pipeline control words
   cw_pipe : process (clk, rst)
   begin
@@ -178,23 +157,29 @@ begin
       alu2 <= (others => '0');
       alu3 <= (others => '0');
     elsif rising_edge(clk) then         -- rising clock edge
+      -- cw3  <= cw2(cw3_array_size-1 downto 0);
+      -- alu3 <= alu2;
+      -- cw4  <= cw3(cw4_array_size-1 downto 0);
+      -- cw5  <= cw4(cw5_array_size-1 downto 0);
+      cw3  <= cw2;
+      alu3 <= alu2;
+      cw4  <= cw3;
+      cw5  <= cw4;
       if branch_taken = '0' then
         cw1  <= cw;
         alu1 <= alu;
-        cw2  <= cw1(cw2_array_size-1 downto 0);
+        -- cw2  <= cw1(cw2_array_size-1 downto 0);
+        cw2  <= cw1;
         alu2 <= alu1;
       else
         alu1 <= alu_nop;
         cw1  <= cw_nop;
         alu2 <= alu_nop;
-        cw2  <= cw_nop(cw2_array_size-1 downto 0);
+        -- cw2  <= cw_nop(cw2_array_size-1 downto 0);
+        cw2  <= cw_nop;
       -- alu3 <= alu_nop;
       -- cw3  <= cw_nop(cw3_array_size-1 downto 0);
       end if;
-      cw3  <= cw2(cw3_array_size-1 downto 0);
-      alu3 <= alu2;
-      cw4  <= cw3(cw4_array_size-1 downto 0);
-      cw5  <= cw4(cw5_array_size-1 downto 0);
     end if;
   end process;
 

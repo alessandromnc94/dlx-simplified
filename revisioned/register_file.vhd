@@ -34,31 +34,35 @@ architecture behavioral of register_file is
 
 begin
   process (clk, reset)
+    variable wr_index, rd1_index, rd2_index : integer := 0;
   begin
     if reset = reset_value then
       out1      <= (others => 'Z');
       out2      <= (others => 'Z');
       registers <= (others => (others => '0'));
     elsif rising_edge(clk) then
+      wr_index  := conv_integer(unsigned(add_wr));
+      rd1_index := conv_integer(unsigned(add_rd1));
+      rd2_index := conv_integer(unsigned(add_rd2));
       if enable = '1' then
         if wr = '1' then
           -- report "The value of 'a' is " & integer'image(2**width_add);
-          if conv_integer(unsigned(add_wr)) /= 0 then
-            registers(conv_integer(unsigned(add_wr))) <= datain;
+          if wr_index /= 0 then
+            registers(wr_index) <= datain;
           end if;
         end if;
         if rd1 = '1' then
-          if conv_integer(unsigned(add_rd1)) = 0 then
+          if rd1_index = 0 then
             out1 <= (others => '0');
           else
-            out1 <= registers(conv_integer(unsigned(add_rd1)));
+            out1 <= registers(rd1_index);
           end if;
         end if;
         if rd2 = '1' then
-          if conv_integer(unsigned(add_rd2)) = 0 then
+          if rd2_index = 0 then
             out2 <= (others => '0');
           else
-            out2 <= registers(conv_integer(unsigned(add_rd2)));
+            out2 <= registers(rd2_index);
           end if;
         end if;
       end if;

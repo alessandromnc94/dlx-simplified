@@ -15,8 +15,8 @@ entity iram is
     addr_size       : natural := 32
     );
   port (
-    rst  : in  std_logic := '0';
-    addr : in  std_logic_vector(addr_size - 1 downto 0) := (others => '0');
+    rst  : in  std_logic                                        := '0';
+    addr : in  std_logic_vector(addr_size - 1 downto 0)         := (others => '0');
     dout : out std_logic_vector(4*data_cell_width - 1 downto 0) := (others => '0')
     );
 

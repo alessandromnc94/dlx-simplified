@@ -6,15 +6,15 @@ entity branch_unit is
     n1 : natural := 32
     );
   port (
-    imm  : in  std_logic_vector(n1-1 downto 0);  --from datapath
-    reg  : in  std_logic_vector(n1-1 downto 0);
-    npc  : in  std_logic_vector(n1-1 downto 0);
-    be   : in  std_logic;                        --from cu
-    bnez : in  std_logic;                        --from cu
-    jr   : in  std_logic;
-    jmp  : in  std_logic;
-    branch_taken: out std_logic;
-    pc   : out std_logic_vector(n1-1 downto 0)
+    imm          : in  std_logic_vector(n1-1 downto 0);  --from datapath
+    reg          : in  std_logic_vector(n1-1 downto 0);
+    npc          : in  std_logic_vector(n1-1 downto 0);
+    be           : in  std_logic;                        --from cu
+    bnez         : in  std_logic;                        --from cu
+    jr           : in  std_logic;
+    jmp          : in  std_logic;
+    branch_taken : out std_logic;
+    pc           : out std_logic_vector(n1-1 downto 0)
     );
 end entity;
 

@@ -14,57 +14,57 @@ entity datapath is
     );
   port (
     -- input
-    instr      : in     std_logic_vector(n_bit-1 downto 0);  --current instruction from iram, feeds the ir
-    lmdin      : in     std_logic_vector(n_bit-1 downto 0);  --lmd register data input
-    clk        : in     std_logic;      --clock signal
-    rst        : in     std_logic;      --general reset signal
+    instr        : in     std_logic_vector(n_bit-1 downto 0);  --current instruction from iram, feeds the ir
+    lmdin        : in     std_logic_vector(n_bit-1 downto 0);  --lmd register data input
+    clk          : in     std_logic;    --clock signal
+    rst          : in     std_logic;    --general reset signal
     -- 1st stage
-    pce        : in     std_logic;      --program counter enable
-    npce       : in     std_logic;      --npc counter enable
-    ire        : in     std_logic;      --instruction register enable
+    pce          : in     std_logic;    --program counter enable
+    npce         : in     std_logic;    --npc counter enable
+    ire          : in     std_logic;    --instruction register enable
     -- 2nd stage
     --register file signals
-    rfe        : in     std_logic;      --enable
-    rfr1       : in     std_logic;      --read enable 1
-    rfr2       : in     std_logic;      --read enable 2
-    rfw        : in     std_logic;      --write enable
+    rfe          : in     std_logic;    --enable
+    rfr1         : in     std_logic;    --read enable 1
+    rfr2         : in     std_logic;    --read enable 2
+    rfw          : in     std_logic;    --write enable
     --branch unit signals
-    be         : in     std_logic;      --branch enable
-    bnez       : in     std_logic;      --beqz/!bnez
-    jr         : in     std_logic;      --jr/!nojr
-    jmp        : in     std_logic;      --jmp/!nojmp
-    branch_taken : out std_logic; -- branch done
+    be           : in     std_logic;    --branch enable
+    bnez         : in     std_logic;    --beqz/!bnez
+    jr           : in     std_logic;    --jr/!nojr
+    jmp          : in     std_logic;    --jmp/!nojmp
+    branch_taken : out    std_logic;    -- branch done
     --sign extender and registers signals
-    see        : in     std_logic;      --sign extender enable
-    ae         : in     std_logic;      --a register enable
-    ben        : in     std_logic;      --b register enable
-    ie         : in     std_logic;      --immediate register enable
-    pre        : in     std_logic;      --pc pipeline reg enable
-    aw1e       : in     std_logic;      --address write1 reg enable
+    see          : in     std_logic;    --sign extender enable
+    ae           : in     std_logic;    --a register enable
+    ben          : in     std_logic;    --b register enable
+    ie           : in     std_logic;    --immediate register enable
+    pre          : in     std_logic;    --pc pipeline reg enable
+    aw1e         : in     std_logic;    --address write1 reg enable
     -- 3rd stage
     --alu signals
-    alusel     : in     alu_array;      --alu operation selectors
+    alusel       : in     alu_array;    --alu operation selectors
     --muxes and registers signals
-    m3s        : in     std_logic;      --mux 3 selector
-    aoe        : in     std_logic;      --alu_out registes enable
-    mee        : in     std_logic;      --me register enable
-    mps        : in     std_logic;      --mux from pc selector
-    mss        : in     std_logic;      --mux to sum 8 to pc selector
-    aw2e       : in     std_logic;      --address write2 reg enable
+    m3s          : in     std_logic;    --mux 3 selector
+    aoe          : in     std_logic;    --alu_out registes enable
+    mee          : in     std_logic;    --me register enable
+    mps          : in     std_logic;    --mux from pc selector
+    mss          : in     std_logic;    --mux to sum 8 to pc selector
+    aw2e         : in     std_logic;    --address write2 reg enable
     -- 4th stage
-    r1e        : in     std_logic;      --register 1 enable
-    msksel2    : in     std_logic;      --selector for load byte mask
-    msksigned2 : in     std_logic;      -- mask is signed if enabled
-    lmde       : in     std_logic;      --lmd register enable
-    aw3e       : in     std_logic;      --address write3 reg enable
+    r1e          : in     std_logic;    --register 1 enable
+    msksel2      : in     std_logic;    --selector for load byte mask
+    msksigned2   : in     std_logic;    -- mask is signed if enabled
+    lmde         : in     std_logic;    --lmd register enable
+    aw3e         : in     std_logic;    --address write3 reg enable
     -- 5th stage
-    m5s        : in     std_logic;      --mux 5 selector
-    mws        : in     std_logic;  --write addr mux selector(mux is physically in decode stage, but driven in wb stage)
+    m5s          : in     std_logic;    --mux 5 selector
+    mws          : in     std_logic;  --write addr mux selector(mux is physically in decode stage, but driven in wb stage)
     -- outputs
-    pcout      : buffer std_logic_vector(n_bit-1 downto 0);  --program counter output per le dimensioni puoi cambiarlo, la iram puo' essere diversa dalla dram
-    aluout     : buffer std_logic_vector(n_bit-1 downto 0);  --alu outpud data
-    meout      : out    std_logic_vector(n_bit-1 downto 0);  --me register data out
-    irout      : buffer std_logic_vector(n_bit-1 downto 0)   -- ir out for cu
+    pcout        : buffer std_logic_vector(n_bit-1 downto 0);  --program counter output per le dimensioni puoi cambiarlo, la iram puo' essere diversa dalla dram
+    aluout       : buffer std_logic_vector(n_bit-1 downto 0);  --alu outpud data
+    meout        : out    std_logic_vector(n_bit-1 downto 0);  --me register data out
+    irout        : buffer std_logic_vector(n_bit-1 downto 0)   -- ir out for cu
     );
 end entity;
 
@@ -102,19 +102,19 @@ architecture structural of datapath is
       n1 : natural := 32
       );
     port (
-      imm  : in  std_logic_vector(n1-1 downto 0);  --from datapath
-      reg  : in  std_logic_vector(n1-1 downto 0);
-      npc  : in  std_logic_vector(n1-1 downto 0);
-      be   : in  std_logic;                        --from cu
-      bnez : in  std_logic;                        --from cu
-      jr   : in  std_logic;
-      jmp  : in  std_logic;
-      branch_taken: out std_logic;
-      pc   : out std_logic_vector(n1-1 downto 0)
+      imm          : in  std_logic_vector(n1-1 downto 0);  --from datapath
+      reg          : in  std_logic_vector(n1-1 downto 0);
+      npc          : in  std_logic_vector(n1-1 downto 0);
+      be           : in  std_logic;                        --from cu
+      bnez         : in  std_logic;                        --from cu
+      jr           : in  std_logic;
+      jmp          : in  std_logic;
+      branch_taken : out std_logic;
+      pc           : out std_logic_vector(n1-1 downto 0)
       );
   end component;
 
-  
+
 
   component register_file is
     generic (
@@ -151,7 +151,7 @@ architecture structural of datapath is
 
   component forwarding_unit is
     generic (
-      n : natural := 5;                --address length
+      n : natural := 5;                 --address length
       m : natural := 32                 --data length
       );
     port (
@@ -210,28 +210,29 @@ architecture structural of datapath is
       );
   end component;
 
-  signal pcin, npcin, npcout, pcregout    : std_logic_vector(n_bit-1 downto 0);
-  -- signal mux31win, addrd1, addrd2    : std_logic_vector(n_bit-1 downto 0) := (others => '0');
-  signal mux31win  : std_logic_vector(reg_addr_size-1 downto 0) := (others => '0');
-  signal  addrd1, addrd2    : std_logic_vector(reg_addr_size-1 downto 0) := (others => '0');
-  signal om5, ain, bin, immin, aout, bout, immout : std_logic_vector(n_bit-1 downto 0);
-  signal fuo1, fuo2 : std_logic_vector(n_bit-1 downto 0);
-  -- signal fuo3, fuo4 : std_logic_vector(n_bit-1 downto 0);
-  signal  om1, om2, om3, oalu, r1out, lmdout, ompc        : std_logic_vector(n_bit-1 downto 0);
-  -- signal omopc, wri, msk2out, aw1o, aw2o, aw3o                      : std_logic_vector(n_bit-1 downto 0);
-  signal omopc, msk2out                    : std_logic_vector(n_bit-1 downto 0);
-  signal wri                    : std_logic_vector(reg_addr_size-1 downto 0);
-  signal aw1o, aw2o, aw3o                      : std_logic_vector(reg_addr_size-1 downto 0);
-  signal fum                                                        : std_logic_vector(1 downto 0);
+  signal pcin, npcin, npcout, pcregout            : std_logic_vector(n_bit-1 downto 0)         := (others => '0');
+  -- signal mux31win, addrd1, addrd2    : std_logic_vector(n_bit-1 downto 0) := (others => '0') := (others => '0');
+  signal mux31win                                 : std_logic_vector(reg_addr_size-1 downto 0) := (others => '0');
+  signal addrd1, addrd2                           : std_logic_vector(reg_addr_size-1 downto 0) := (others => '0');
+  signal om5, ain, bin, immin, aout, bout, immout : std_logic_vector(n_bit-1 downto 0)         := (others => '0');
+  signal immin_original : std_logic_vector(15 downto 0)         := (others => '0');
+  signal fuo1, fuo2                               : std_logic_vector(n_bit-1 downto 0)         := (others => '0');
+  -- signal fuo3, fuo4 : std_logic_vector(n_bit-1 downto 0) := (others => '0');
+  signal om1, om2, om3, oalu, r1out, lmdout, ompc : std_logic_vector(n_bit-1 downto 0)         := (others => '0');
+  -- signal omopc, wri, msk2out, aw1o, aw2o, aw3o                      : std_logic_vector(n_bit-1 downto 0) := (others => '0');
+  signal omopc, msk2out                           : std_logic_vector(n_bit-1 downto 0)         := (others => '0');
+  signal wri                                      : std_logic_vector(reg_addr_size-1 downto 0) := (others => '0');
+  signal aw1o, aw2o, aw3o                         : std_logic_vector(reg_addr_size-1 downto 0) := (others => '0');
+  signal fum                                      : std_logic_vector(1 downto 0)               := (others => '0');
 
   signal reg_rst : std_logic := '1';
 
 begin
 
-  reg_rst_1_gen: if reset_value = '1' generate
+  reg_rst_1_gen : if reset_value = '1' generate
     reg_rst <= rst;
   end generate reg_rst_1_gen;
-  reg_rst_0_gen: if reset_value = '0' generate
+  reg_rst_0_gen : if reset_value = '0' generate
     reg_rst <= not rst;
   end generate reg_rst_0_gen;
 
@@ -248,29 +249,33 @@ begin
 
   --decode stage
   -- 31 downto 26 OPCODE
-  -- 25 downto 21 REG_TO_WRITE
-  -- 20 downto 16 REG_READ_1
-  -- 15 downto 11 REG_READ_2
+  -- 25 downto 21 REG_READ_1
+  -- 20 downto 16 REG_READ_2
+  -- 15 downto 11 REG_TO_WRITE
 
   -- mux31win(n_bit-1 downto reg_addr_size) <= (others => '0');
   -- mux31win(reg_addr_size-1 downto 0)       <= irout(n_bit-7 downto n_bit-6-reg_addr_size);
-  mux31win(reg_addr_size-1 downto 0)       <= irout(25 downto 21);
+  mux31win(reg_addr_size-1 downto 0) <= irout(15 downto 11) when irout(31 downto 26) = "000000" else addrd2;
   -- addrd1(n_bit-1 downto reg_addr_size) <= (others => '0');
   -- addrd1(reg_addr_size-1 downto 0)     <= irout(n_bit-7-reg_addr_size downto n_bit-6-2*reg_addr_size);
-  addrd1(reg_addr_size-1 downto 0)     <= irout(20 downto 16);
+  addrd1(reg_addr_size-1 downto 0)   <= irout(25 downto 21);
   -- addrd2(n_bit-1 downto reg_addr_size)   <= (others => '0');
   -- addrd2(reg_addr_size-1 downto 0)       <= irout(n_bit-7-2*reg_addr_size downto n_bit-6-3*reg_addr_size);
-  addrd2(reg_addr_size-1 downto 0)       <= irout(15 downto 11);
+  addrd2(reg_addr_size-1 downto 0)   <= irout(20 downto 16);
+  -- addrd2(n_bit-1 downto reg_addr_size)   <= (others => '0');
+  -- addrd2(reg_addr_size-1 downto 0)       <= irout(n_bit-7-2*reg_addr_size downto n_bit-6-3*reg_addr_size);
+  immin_original(15 downto 0)   <= irout(15 downto 0);
 
   -- debug
   process(clk)
   begin
     if rising_edge(clk) then
-      report "ADDRRD1 #" & Integer'image(conv_integer(unsigned(addrd1)));
-      report "ADDRRD2 #" & Integer'image(conv_integer(unsigned(addrd2)));
-      report "MUX31 #" & Integer'image(conv_integer(unsigned(mux31win)));
-      end if;
-    end process;
+      report "ADDRRD1 #" & integer'image(conv_integer(unsigned(addrd1)));
+      report "ADDRRD2 #" & integer'image(conv_integer(unsigned(addrd2)));
+      report "MUX31 #" & integer'image(conv_integer(unsigned(mux31win)));
+      report "IMMIN_ORIGINAL #" & integer'image(conv_integer(unsigned(immin_original)));
+    end if;
+  end process;
 
 
 
@@ -279,9 +284,9 @@ begin
   reg_file : register_file generic map(width_add => reg_addr_size, width_data => n_bit)
     port map(clk, rst, rfe, rfr1, rfr2, rfw, aw3o, addrd1, addrd2, om5, ain, bin);
   sign_extend : sign_extender generic map(n_in => imm_val_size, n_out => n_bit)
-    port map(irout(n_bit-17 downto 0), see, immin);
+    port map(immin_original, see, immin);
   branch : branch_unit generic map(n1 => n_bit)
-    port map(immin, om1, npcout, be, bnez, jr, jmp, branch_taken,pcin);
+    port map(immin, om1, npcout, be, bnez, jr, jmp, branch_taken, pcin);
   forwinst : forwarding_unit generic map(n => reg_addr_size, m => n_bit)
     port map(addrd1, addrd2, aw1o, aw2o, aw3o, aw1e, aw2e, aw3e, oalu, aluout, om5, clk, fum, fuo1, fuo2);
   mux1 : mux_n_2_1 generic map(n => n_bit)

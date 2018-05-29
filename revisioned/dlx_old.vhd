@@ -283,7 +283,7 @@ architecture structural of dlx_old is
   signal cu_hw_branch_taken       : std_logic;
   signal cu_hw_opcode             : opcode_array;
   signal cu_hw_func               : func_array;
-  signal opname               : string(1 to 14) := (others => ' ');
+  signal opname                   : string(1 to 14) := (others => ' ');
 
 begin
 
